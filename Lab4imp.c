@@ -1,21 +1,81 @@
-void writeDataByte(char dataByte);
+void LCDinit()
+{
+    writeCommandNibble(0x03);
 
-void writeCommandNibble(char commandNibble);
+    writeCommandNibble(0x03);
 
-void writeCommandByte(char commandByte);
+    writeCommandNibble(0x03);
 
-void initSPI();
+    writeCommandNibble(0x02);
 
-void LCDinit();
+    writeCommandByte(0x28);
 
-void LCDclear();
+    writeCommandByte(0x0C);
 
-void cursorToLineTwo();
+    writeCommandByte(0x01);
 
-void cursorToLineOne();
+    writeCommandByte(0x06);
 
-void writeChar(char asciiChar);
+    writeCommandByte(0x01);
 
-void writeString(char * string);
+    writeCommandByte(0x02);
 
-void scrollString(char * string1, char * string2);
+    SPI_send(0);
+    delayMicro();
+}
+
+void writeCommandNibble(char commandNibble)
+{
+    LCDCON &= ~RS_MASK;
+    LCD_write_4(commandNibble);
+    delayMilli();
+}
+
+void writeCommandByte(char commandByte)
+{
+    LCDCON &= ~RS_MASK;
+    LCD_write_8(commandByte);
+    delayMilli();
+}
+
+void writeDataByte(char dataByte)
+{
+    LCDCON |= RS_MASK;
+    LCD_write_8(dataByte);
+    delayMilli();
+}
+
+void LCD_write_8(char byteToSend)
+{
+    unsigned char sendByte = byteToSend;
+
+    sendByte &= 0xF0;
+
+    sendByte = sendByte >> 4;               // rotate to the right 4 times
+
+    LCD_write_4(sendByte);
+
+    sendByte = byteToSend;
+
+    sendByte &= 0x0F;
+
+    LCD_write_4(sendByte);
+}
+
+void SPI_send(char byteToSend)
+{
+    char readByte;
+
+    set_SS_lo();
+
+    UCB0TXBUF = byteToSend;
+
+    while(!(UCB0RXIFG & IFG2))
+    {
+        // wait until you've received a byte
+    }
+
+    readByte = UCB0RXBUF;
+
+    set_SS_hi();
+}
