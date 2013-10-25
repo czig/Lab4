@@ -5,6 +5,9 @@
 // Description: Header file for interaction with LCD
 //
 
+#ifndef LCD_H_
+#define LCD_H_
+
 void writeDataByte(char dataByte);
 
 void writeCommandNibble(char commandNibble);
@@ -21,6 +24,8 @@ void LCDinit();
 
 void LCDclear();
 
+void SPI_send(char byteToSend);
+
 void MoveCursorLineTwo();
 
 void MoveCursorLineOne();
@@ -31,3 +36,4 @@ void writeString(char *string);
 
 void scrollString(char *string1, char *string2);
 
+#endif /* LCD_H_ */

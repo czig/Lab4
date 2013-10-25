@@ -15,9 +15,12 @@
 int main(void) {
     WDTCTL = WDTPW | WDTHOLD;	// Stop watchdog timer
 
+    char string1[] = "ECE382 is my favorite class! ";
+    char string2[] = "They call me tater salad. ";
     initSPI();
     LCDinit();
     LCDclear();
+    scrollString(string1,string2);
 
     while(1)
     {
