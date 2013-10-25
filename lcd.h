@@ -25,9 +25,9 @@ void MoveCursorLineTwo();
 
 void MoveCursorLineOne();
 
-void writeChar(char asciiChar);
+void writeCharacter(char asciiCharacter);
 
-void writeString(char * string);
+void writeString(char *string);
 
-void scrollString(char * string1, char * string2);
+void scrollString(char *string1, char *string2);
 

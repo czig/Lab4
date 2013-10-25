@@ -5,6 +5,7 @@
  * Description: Implementation for lcd functions
  */
 #include "lcd.h"
+#include "msp430.h"
 #define RS_MASK 0x40
 
 void initSPI()
@@ -65,7 +66,7 @@ void LCDinit()
     writeCommandByte(0x02);
 
     SPI_send(0);
-    delayMicro();
+    __delay_cycles(45);
 }
 
 void LCDclear()
@@ -77,21 +78,21 @@ void writeCommandNibble(char commandNibble)
 {
     LCDCON &= ~RS_MASK;
     LCD_write_4(commandNibble);
-    delayMilli();
+    __delay_cycles(1824);
 }
 
 void writeCommandByte(char commandByte)
 {
     LCDCON &= ~RS_MASK;
     LCD_write_8(commandByte);
-    delayMilli();
+    __delay_cycles(1824);
 }
 
 void writeDataByte(char dataByte)
 {
     LCDCON |= RS_MASK;
     LCD_write_8(dataByte);
-    delayMilli();
+    __delay_cycles(1824);
 }
 
 void LCDclear()
@@ -99,27 +100,28 @@ void LCDclear()
 	writeCommandByte(1);
 }
 
+//Thanks to C2C Jason Mossing for helping me figure this one out
 void LCD_write_4(char nibbleToSend)
 {
 	unsigned char sendnibble = nibbleToSend;
 
-	    sendnibble &= 0x0F;
+	    sendnibble &= 0x0F;              //Clear upper half of byte but save lower half
 
-	    sendnibble |= LCDCON;
+	    sendnibble |= LCDCON;            //Set LCD control nibble
 
-	    sendnibble &= 0x7F;
-
-	    SPI_send(sendnibble);
-
-	    __delay_cycles(45);
-
-	    sendnibble |= 0x80;
+	    sendnibble &= 0x7F;              //Set E low
 
 	    SPI_send(sendnibble);
 
 	    __delay_cycles(45);
 
-	    sendnibble &= 0x7F;
+	    sendnibble |= 0x80;             //Set E high
+
+	    SPI_send(sendnibble);
+
+	    __delay_cycles(45);
+
+	    sendnibble &= 0x7F;             //Set E low
 
 	    SPI_send(sendnibble);
 
@@ -163,16 +165,31 @@ void SPI_send(char byteToSend)
 
 void MoveCursorLineOne()
 {
-	writeCommandByte(0x02);  //0x02 sets cursor to starting position
+	writeCommandByte(0x02);  //0x02 sets cursor at home
 }
 
 void MoveCursorLineTwo()
 {
-	writeCommandByte(0x02); //Set cursor at starting spot
+	writeCommandByte(0x02); //Set cursor at home
 	int i;
 	for(i = 0; i < 40; i++)
 	{
 		writeCommandByte(0x14); //0x14 shifts cursor to right once, and do this 40 times to get to next line
 	}
+}
+
+void writeString(char *string)
+{
+	while(*string != 0)   //Stops writing string when memory location is 0 (no more characters)
+	{
+		writeCharacter(*string);
+		string++;
+
+	}
+}
+
+void writeCharacter(char asiiCharacter)
+{
+	writeDataByte(asiiCharacter);
 }
 
