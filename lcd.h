@@ -21,9 +21,9 @@ void LCDinit();
 
 void LCDclear();
 
-void cursorToLineTwo();
+void MoveCursorLineTwo();
 
-void cursorToLineOne();
+void MoveCursorLineOne();
 
 void writeChar(char asciiChar);
 

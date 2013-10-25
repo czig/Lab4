@@ -1,3 +1,12 @@
+/*
+ * lcd.c
+ * Author: C2C Caleb Ziegler
+ * Date: 22 Oct 2013
+ * Description: Implementation for lcd functions
+ */
+#include "lcd.h"
+#define RS_MASK 0x40
+
 void initSPI()
 {
 	UCB0CTL1 |= UCSWRST;
@@ -59,12 +68,11 @@ void LCDinit()
     delayMicro();
 }
 
-void LCDclear(writebyte)
+void LCDclear()
 {
-	LCDCON = 0;
-	LCDSEND =1;
-	LCD_write_8(char writebyte)
+	writeCommandByte(1);
 }
+
 void writeCommandNibble(char commandNibble)
 {
     LCDCON &= ~RS_MASK;
@@ -84,6 +92,38 @@ void writeDataByte(char dataByte)
     LCDCON |= RS_MASK;
     LCD_write_8(dataByte);
     delayMilli();
+}
+
+void LCDclear()
+{
+	writeCommandByte(1);
+}
+
+void LCD_write_4(char nibbleToSend)
+{
+	unsigned char sendnibble = nibbleToSend;
+
+	    sendnibble &= 0x0F;
+
+	    sendnibble |= LCDCON;
+
+	    sendnibble &= 0x7F;
+
+	    SPI_send(sendnibble);
+
+	    __delay_cycles(45);
+
+	    sendnibble |= 0x80;
+
+	    SPI_send(sendnibble);
+
+	    __delay_cycles(45);
+
+	    sendnibble &= 0x7F;
+
+	    SPI_send(sendnibble);
+
+	    __delay_cycles(45);
 }
 
 void LCD_write_8(char byteToSend)
@@ -120,3 +160,19 @@ void SPI_send(char byteToSend)
 
     set_SS_hi();
 }
+
+void MoveCursorLineOne()
+{
+	writeCommandByte(0x02);  //0x02 sets cursor to starting position
+}
+
+void MoveCursorLineTwo()
+{
+	writeCommandByte(0x02); //Set cursor at starting spot
+	int i;
+	for(i = 0; i < 40; i++)
+	{
+		writeCommandByte(0x14); //0x14 shifts cursor to right once, and do this 40 times to get to next line
+	}
+}
+
