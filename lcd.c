@@ -5,8 +5,10 @@
  * Description: Implementation for lcd functions
  */
 #include "lcd.h"
-#include "msp430.h"
+#include <msp430.h>
 #define RS_MASK 0x40
+
+unsigned int LCDCON = 0;
 
 void initSPI()
 {
