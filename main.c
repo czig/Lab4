@@ -1,35 +1,47 @@
 /*******************************************
-  * Author: C2C Caleb Ziegler/CS-39
-  * Created: 22 Oct 2013
-  * Description: This library interfaces
-  * with the LCD on the Geek box and displays
-  * a string of characters on the top and bottom
-  * lines.
-*******************************************/
+ * Author: C2C Caleb Ziegler/CS-39
+ * Created: 22 Oct 2013
+ * Description: This library interfaces
+ * with the LCD on the Geek box and displays
+ * a string of characters on the top and bottom
+ * lines.
+ *******************************************/
 #include <msp430.h> 
 #include "lcd.h"
+#include "button.h"
 /*
  * main.c
  */
+void main(void) {
 
-int main(void) {
-    WDTCTL = WDTPW | WDTHOLD;	// Stop watchdog timer
+	WDTCTL = WDTPW | WDTHOLD;        // Stop watchdog time
 
-    char string1[] = "ECE382 is my favorite class! ";
-    char string2[] = "They call me tater salad. ";
-    initSPI();
-    LCDinit();
-    LCDclear();
-    scrollString(string1,string2);
+	configureP1PinAsButton(BIT1 | BIT2 | BIT3); // configure pins 1, 2, and 3 as buttons
+	initSPI();
+	LCDinit();
+	LCDclear();
+	char string1[] = "ECE382 is my favorite class! ";
+	char string2[] = "Here's your sign. ";
+	char string3[] = "Git 'er dun. ";
+	char string4[] = "Ron White: Tater Salad. ";
 
-    while(1)
-    {
+	MoveCursorLineOne();
+	writeString("Message?");
+	MoveCursorLineTwo();
+	writeString("Press123");
 
-    }
-	
-	return 0;
+		char buttons[] = { BIT1, BIT2, BIT3 };
+		char pressedButton = pollP1Buttons(buttons, 3);
+
+		switch (pressedButton) {
+		case BIT1:
+			scrollString(string1,string2);
+			break;
+		case BIT2:
+			scrollString(string1,string3);
+			break;
+		case BIT3:
+			scrollString(string1,string4);
+			break;
+		}
 }
-
-
-
-
