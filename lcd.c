@@ -11,6 +11,20 @@
 
 char LCDCON = 0;
 
+void writeDataByte(char dataByte);
+
+void writeCommandNibble(char commandNibble);
+
+void writeCommandByte(char commandByte);
+
+void set_SS_hi();
+
+void set_SS_lo();
+
+void SPI_send(char byteToSend);
+
+void rotateString(char * string);
+
 void initSPI() {
 	UCB0CTL1 |= UCSWRST;
 
@@ -163,9 +177,9 @@ void MoveCursorLineTwo() {
 
 void writeString(char *string) {
 	int i;
-	for(i = 0; i < 8; i++)
+	for(i = 0; i < 8; i++)              //Will only write the first 8 characters of a string to the LCD
 	{
-		writeCharacter(string[i]);
+		writeCharacter(string[i]);      //Leverages writeCharacter to write characters of the string to the LCD
 	}
 }
 
@@ -175,15 +189,15 @@ void writeCharacter(char asiiCharacter) {
 
 void rotateString(char * string)
 {
-	char firstChar = string[0];
+	char firstChar = string[0];           //Saves first character in string for later use
 	int i;
 
-	for (i = 0; string[i+1] != 0; i++)
+	for (i = 0; string[i+1] != 0; i++)    //Stop once the next character in string is null case stop
 	{
-		string[i] = string[i+1];
+		string[i] = string[i+1];          //Rotate string to right by making the current character in string equal the next character in string
 	}
 
-	string[i] = firstChar;
+	string[i] = firstChar;                //Move previously first character in the string to the end of the string to preserve that character and perform a correct rotate right
 }
 
 void scrollString(char *string1, char *string2) {
@@ -200,28 +214,3 @@ void scrollString(char *string1, char *string2) {
 
 }
 
-/*
-void scrollString(char *string1, char *string2) {
-	char *cursor1 = string1;
-	char *cursor2 = string2;
-
-	while (1) {
-
-		MoveCursorLineOne();
-		writeString(cursor1);
-		MoveCursorLineTwo();
-		writeString(cursor2);
-		cursor1++;
-		cursor2++;
-
-
-		if (*(cursor1 + 8) == 0x00) {
-			cursor1 = string1;
-		}
-		if (*(cursor2 + 8) == 0x00) {
-			cursor2 = string2;
-		}
-	}
-
-}
-*/

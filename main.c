@@ -33,6 +33,8 @@ void main(void) {
 		char buttons[] = { BIT1, BIT2, BIT3 };
 		char pressedButton = pollP1Buttons(buttons, 3);
 
+		//Displays string2, string3, or string4 on line two depending on whether
+		//buttons 1, 2, or 3 are pressed, respectively.
 		switch (pressedButton) {
 		case BIT1:
 			scrollString(string1,string2);
